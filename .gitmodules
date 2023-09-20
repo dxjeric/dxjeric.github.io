@@ -1,0 +1,3 @@
+[submodule ".\\jekyll-rtd-theme"]
+	path = .\\jekyll-rtd-theme
+	url = https://github.com/rundocs/jekyll-rtd-theme.git
