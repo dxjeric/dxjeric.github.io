@@ -2,7 +2,7 @@
 sort: 1
 ---
 
-# Java8 笔记
+# 第一章 基础
 
 ```tip
 Set config `plugins: [jekyll-avatar]`
