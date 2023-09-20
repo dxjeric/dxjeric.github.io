@@ -1,8 +1,8 @@
 ---
-sort: 7
+sort: 1
 ---
 
-# Avatar Test
+# Java8 笔记
 
 ```
 {% raw %}{% avatar saowang %}{% endraw %}
