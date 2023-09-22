@@ -127,7 +127,7 @@ Java 8也用Stream API（ java.util.stream） 解决了这两个问题： 集合
 import static java.util.stream.Collectors.toList;
 List<Apple> heavyApples = inventory.stream().filter((Apple a) -> a.getWeight() > 150).collect(toList());
 ```
-![图 1-6 将filter分支到两个CPU上并聚合结果](https://github.com/dxjeric/dxjeric.github.io/blob/master/_pic/Java/Java8/pic1-6.jpg)
+![图 1-6 将filter分支到两个CPU上并聚合结果](https://github.com/dxjeric/dxjeric.github.io/blob/master/picture/Java/Java8/pic1-6.jpg)
 
 **并行处理如下:**
 ```java
