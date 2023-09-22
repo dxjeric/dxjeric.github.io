@@ -11,6 +11,8 @@ theme: null
 readme_index:
   with_frontmatter: true
 
+# paginate: 5
+
 plugins:
   - jemoji
   - jekyll-avatar
