@@ -99,7 +99,7 @@ public class AppleRedAndHeavyPredicate implements ApplePredicate {
 List<Apple> redAndHeavyApples = filterApples(inventory, new AppleRedAndHeavyPredicate());
 ```
 
-在[第3节]()（ [第3章](./chapter-3.md)中有更详细的内容） 中看到， 通过使用Lambda， 你可以直接把表达式"red".equals(apple.getColor()) &&apple.getWeight() >150传递给filterApples方法， 而无需定义多个ApplePredicate类， 从而去掉不必要的代码。
+在[第3节](#3-简化行为参数)（ [第3章](./chapter-3.md)中有更详细的内容） 中看到， 通过使用Lambda， 你可以直接把表达式"red".equals(apple.getColor()) &&apple.getWeight() >150传递给filterApples方法， 而无需定义多个ApplePredicate类， 从而去掉不必要的代码。
 
 **行为参数化**
 
