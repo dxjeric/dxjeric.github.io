@@ -71,7 +71,9 @@ public class AppleGreenColorPredicate implements ApplePredicate { // 仅仅选�
     }
 }
 ```
-![选择苹果的不同策略](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic2-1.png)
+![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic2-1.png)
+
+**选择苹果的不同策略**
 
 你可以把这些标准看作filter方法的不同行为。 你刚做的这些和[“策略设计模式”](http://en.wikipedia.org/wiki/Strategy_pattern)相关， 它让你定义一族算法， 把它们封装起来（ 称为“策略” ） ， 然后在运行时选择一个算法。 在这里， 算法族就是ApplePredicate， 不同的策略就是AppleHeavyWeightPredicate和AppleGreenColorPredicate。
 
