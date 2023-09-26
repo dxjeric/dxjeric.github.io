@@ -2,7 +2,7 @@
 sort: 2
 ---
 # 第二章 通过行为参数化传递代码
-**内容简介: **
+内容简介: 
 * 应对不断变化的需求
     行为参数化就是可以帮助你处理频繁变更的需求的一种软件开发模式。 一言以蔽之， 它意味着拿出一个代码块， 把它准备好却不去执行它。 这个代码块以后可以被你程序的其他部分调用， 这意味着你可以推迟这块代码的执行。
 * 行为参数化
@@ -99,8 +99,6 @@ List<Apple> redAndHeavyApples = filterApples(inventory, new AppleRedAndHeavyPred
 ```
 
 在[第3节](#3-简化行为参数)（ [第3章](./chapter-3.md)中有更详细的内容） 中看到， 通过使用Lambda， 你可以直接把表达式"red".equals(apple.getColor()) &&apple.getWeight() >150传递给filterApples方法， 而无需定义多个ApplePredicate类， 从而去掉不必要的代码。
-
-**行为参数化**
 
 ![参数化filterApples的行为并传递不同的筛选策略](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic2-3.png)
 
