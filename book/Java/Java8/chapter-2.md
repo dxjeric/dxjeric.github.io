@@ -102,7 +102,8 @@ List<Apple> redAndHeavyApples = filterApples(inventory, new AppleRedAndHeavyPred
 在[第3节]()（ [第3章](./chapter-3.md)中有更详细的内容） 中看到， 通过使用Lambda， 你可以直接把表达式"red".equals(apple.getColor()) &&apple.getWeight() >150传递给filterApples方法， 而无需定义多个ApplePredicate类， 从而去掉不必要的代码。
 
 **行为参数化**
-[参数化filterApples的行为并传递不同的筛选策略](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic2-3.png)
+
+![参数化filterApples的行为并传递不同的筛选策略](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic2-3.png)
 
 ## 3. 简化行为参数
 * 匿名类
@@ -162,7 +163,7 @@ List<Apple> result = filterApples(inventory, (Apple apple) -> "red".equals(apple
 ```
 使用Lambda表达式的代码看上去比先前干净很多。
 
-[行为参数化与值参数化不同方式比较](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic2-4.png)
+![行为参数化与值参数化不同方式比较](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic2-4.png)
 
 ### 3.4 将List类型抽象化 实现不同水果筛选
 将List类型抽象化， 从而超越你眼前要处理的问题，这样可以实现不同水果的筛选
