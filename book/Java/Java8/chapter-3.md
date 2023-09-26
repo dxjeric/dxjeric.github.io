@@ -59,3 +59,24 @@ Lambda的基本语法是 ```(parameters) -> expression``` 或者 ```(parameters)
 ## 2. Lambda使用场景
 ### 2.1 函数式接口
 函数式接口就是只定义**一个**抽象方法的接口。 Java API中的一些其他函数式接口， 如[第二章](./chapter-2.md)中谈到的Comparator和Runnable。
+
+Lambda表达式允许你直接以内联的形式为函数式接口的抽象方法提供实现，并把整个表达式作为函数式接口的实例（ 具体说来， 是函数式接口一个具体实现的实例） 。 
+
+### 2.2 函数描述符
+函数式接口的抽象方法的签名基本上就是Lambda表达式的签名。 我们将这种抽象方法叫作函数描述符。 例如， Runnable接口可以看作一个什么也不接受什么也不返回（ void） 的函数的签名， 因为它只有一个叫作run的抽象方法， 这个方法什么也不接受， 什么也不返回（ void） 。
+
+本章中使用了一个特殊表示法来描述Lambda和函数式接口的签名。 () -> void代表了参数列表为空， 且返回void的函数。 这正是Runnable接口所代表的。举另一个例子， (Apple, Apple) -> int代表接受两个Apple作为参数且返回int的函数。 
+
+## 3. 把Lambda付诸实践： 环绕执行模式
+资源处理（ 例如处理文件或数据库） 时一个常见的模式就是打开一个资源， 做一些处理， 然后关闭资源。 这个设置和清理阶段总是很类似， 并且会围绕着执行处理的那些重要代码。 这就是所谓的环绕执行（ execute around） 模式，如下图所示。 例如， 在以下代码中， 高亮显示的就是从一个文件中读取一行所需的模板代码（ 注意你使用了Java 7中的带资源的try语句， 它已经简化了代码， 因为你不需要显式地关闭资源了） ：
+```java
+public static String processFile() throws IOException {
+    try (BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
+        return br.readLine(); // 这就是做有用工作的那行代码
+    }
+}
+```
+![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic3-2.png)
+
+**任务A和任务B周围都环绕着进行准备/清理的同一段冗余代码**
+### 3.1 第1步： 记得行为参数化
