@@ -79,4 +79,46 @@ public static String processFile() throws IOException {
 ![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic3-2.png)
 
 **任务A和任务B周围都环绕着进行准备/清理的同一段冗余代码**
+
 ### 3.1 第1步： 记得行为参数化
+```java
+String result = processFile((BufferedReader br) -> br.readLine() + br.readLine());
+```
+### 3.2 第2步： 使用函数式接口来传递行为
+```java
+@FunctionalInterface
+public interface BufferedReaderProcessor {
+    String process(BufferedReader b) throws IOException;
+}
+
+public static String processFile(BufferedReaderProcessor p) throws IOException {
+    // do some thing
+}
+```
+
+### 3.3 第3步： 执行一个行为
+任何BufferedReader -> String形式的Lambda都可以作为参数来传递， 因为它们符合BufferedReaderProcessor接口中定义的process方法的签名。 现在你只需要一种方法在processFile主体内执行Lambda所代表的代码。 Lambda表达式允许你直接内联， 为函数式接口的抽象方法提供实现， 并且将整个表达式作为函数式接口的一个实例。 因此， 你可以在processFile主体内， 对得到的BufferedReaderProcessor对象调用process方法执行处理：
+```java
+public static String processFile(BufferedReaderProcessor p) throws IOException {
+    try (BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
+        return p.process(br); // 处理BufferedReader对象
+    }
+}
+```
+
+### 3.4 第4步： 传递Lambda
+通过传递不同的Lambda重用processFile方法， 并以不同的方式处理文件了。
+```java
+// 处理一行
+String oneLine = processFile((BufferedReader br) -> br.readLine());
+// 处理两行
+String twoLines = processFile((BufferedReader br) -> br.readLine() + br.readLine());
+```
+
+下图总结了所采取的使pocessFile方法更灵活的四个步骤。
+![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic3-3.png)
+
+**应用环绕执行模式所采取的四个步骤**
+
+## 4. 使用函数式接口
+
