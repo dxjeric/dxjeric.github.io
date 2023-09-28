@@ -122,3 +122,88 @@ String twoLines = processFile((BufferedReader br) -> br.readLine() + br.readLine
 
 ## 4. 使用函数式接口
 
+### 4.1 Predicate
+```java.util.function.Predicate<T>```接口定义了一个名叫test的抽象方法， 它接受泛型T对象， 并返回一个boolean。 
+
+### 4.2 Consumer
+```java.util.function.Consumer<T>```定义了一个名叫accept的抽象方法， 它接受泛型T的对象， 没有返回（ void）。
+
+### 4.3 Function
+```java.util.function.Function<T, R>```接口定义了一个叫作apply的方法， 它接受一个泛型T的对象， 并返回一个泛型R的对象。 如果你需要定义一个Lambda， 将输入对象的信息映射到输出， 就可以使用这个接口（ 比如提取苹果的重量， 或把字符串映射为它的长度）。
+```java
+@FunctionalInterface
+public interface Function<T, R> {
+    R apply(T t);
+}
+
+public static <T, R> List<R> map(List<T> list, Function<T, R> f) {
+    List<R> result = new ArrayList<>();
+    for (T s : list) {
+        result.add(f.apply(s));
+    }
+    return result;
+}
+
+// l的结果为 [7, 2, 6]
+List<Integer> l = map(
+        Arrays.asList("lambdas", "in", "action"),
+        (String s) -> s.length() // Lambda是Function接口的apply方法的实现
+);
+```
+
+**Java类型要么是引用类型（比如Byte、 Integer、 Object、 List）， 要么是原始类型（比如int、double、byte、char）。 但是泛型（比如Consumer\<T\>中的T）只能绑定到引用类型。 这是由泛型内部的实现方式造成的。 因此， 在Java里有一个将原始类型转换为对应的引用类型的机制。 这个机制叫作装箱（boxing）。 相反的操作， 也就是将引用类型转换为对应的原始类型， 叫作拆箱（unboxing）。 Java还有一个自动装箱机制来帮助程序员执行这一任务：装箱和拆箱操作是自动完成的。 如此处理在性能方面是要付出代价的， 装箱后的值本质上就是把原始类型包裹起来， 并保存在堆里。 因此， 装箱后的值需要更多的内存， 并需要额外的内存搜索来获取被包裹的原始值。**
+
+Java 8为我们前面所说的函数式接口带来了一个专门的版本， 以便在输入和输出都是原始类型时避免自动装箱的操作。 比如， 在下面的代码中， 使用IntPredicate就避免了对值1000进行装箱操作， 但要是用Predicate\<Integer\>就会把参数1000装箱到一个Integer对象中：
+```java
+public interface IntPredicate {
+    boolean test(int t);
+}
+
+IntPredicate evenNumbers = (int i) -> { return (i%2) == 0; }
+evenNumbers.test(1000); // true（ 无装箱）
+
+Predicate<Integer> oddNumbers = (Integer i) -> i % 2 == 1;
+oddNumbers.test(1000); // false（ 装箱）
+```
+
+一般来说， 针对专门的输入参数类型的函数式接口的名称都要加上对应的原始类型前缀， 比如DoublePredicate、 IntConsumer、 LongBinaryOperator、 IntFunction等。 Function接口还有针对输出参数类型的变种： ToIntFunction\<T\>、 IntToDoubleFunction等。
+
+下面的表格中列出了Java 8中的常用函数式接口:
+| 函数式接口          | 函数描述符     | 原始类型特化                                                 |
+| ------------------- | -------------- | ------------------------------------------------------------ |
+| Predicate\<T\>      | T->boolean     | IntPredicate,LongPredicate, DoublePredicate                  |
+| Consumer\<T\>       | T->void        | IntConsumer,LongConsumer, DoubleConsumer                     |
+| Function\<T,R\>     | T->R           | IntFunction\<R\>, IntToDoubleFunction, IntToLongFunction, LongFunction<R>, LongToDoubleFunction, LongToIntFunction, DoubleFunction<R>, ToIntFunction\<T\>, ToDoubleFunction\<T\>, ToLongFunction\<T\> |
+| Supplier\<T\>       | ()->T          | BooleanSupplier,IntSupplier, LongSupplier, DoubleSupplier    |
+| UnaryOperator\<T\>  | T->T           | IntUnaryOperator, LongUnaryOperator, DoubleUnaryOperator     |
+| BinaryOperator\<T\> | (T,T)->T       | IntBinaryOperator, LongBinaryOperator, DoubleBinaryOperator  |
+| BiPredicate<L,R\>   | (L,R)->boolean |                                                              |
+| BiConsumer\<T,U\>   | (T,U)->void    | ObjIntConsumer\<T\>, ObjLongConsumer\<T\>, ObjDoubleConsumer\<T\> |
+| BiFunction\<T,U,R\> | (T,U)->R       | ToIntBiFunction\<T,U\>, ToLongBiFunction\<T,U\>, ToDoubleBiFunction\<T,U\> |
+
+下面表格中列出了Lambdas及函数式接口的例子:
+| 使用案例               | Lambda的例子                                                 | 对应的函数式接口                                             |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 布尔表达式             | (List\<String\> list) -> list.isEmpty()                        | Predicate\<List\<String\>\>                                      |
+| 创建对象               | () -> new Apple(10)                                          | Supplier\<Apple\>                                              |
+| 消费一个对象           | (Apple a) -> System.out.println(a.getWeight())               | Consumer\<Apple\>                                              |
+| 从一个对象中选择/提 取 | (String s) -> s.length()                                     | Function\<String, Integer\>或 ToIntFunction\<String\>            |
+| 合并两个值             | (int a, int b) -> a * b                                      | IntBinaryOperator                                            |
+| 比较两个对象           | (Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight()) | Comparator\<Apple\>或 BiFunction\<Apple, Apple, Integer\>或 ToIntBiFunction\<Apple, Apple\> |
+
+
+**请注意， 任何函数式接口都不允许抛出受检异常（ checked exception） 。 如果你需要Lambda表达式来抛出异常， 有两种办法： 定义一个自己的函数式接口， 并声明受检异常， 或者把Lambda包在一个try/catch块中。**
+**比如， 在3.3节我们介绍了一个新的函数式接口BufferedReaderProcessor，它显式声明了一个IOException**
+
+但是你可能是在使用一个接受函数式接口的API， 比如```Function<T, R>```， 没有办法自己创建一个（ 你会在下一章看到， Stream API中大量使用表3-2中的函数式接口） 。 这种情况下， 你可以显式捕捉受检异常：
+```java
+Function<BufferedReader, String> f = (BufferedReader b) -> {
+    try {
+        return b.readLine();
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+};
+```
+
+## 5. 类型检查、 类型推断以及限制
