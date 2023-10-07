@@ -396,3 +396,70 @@ nventory.sort(comparing(Apple::getWeight));
 ```
 
 ## 8. 复合Lambda表达式的有用方法
+Java 8的好几个函数式接口都有为方便而设计的方法。 具体而言， 许多函数式接口， 比如用于传递Lambda表达式的Comparator、 Function和Predicate都提供了允许你进行复合的方法。  在实践中， 这意味着你可以把多个简单的Lambda复合成复杂的表达式。 比如， 你可以让两个Predicate之间做一个or操作， 组合成一个更大的Predicate。 而且， 你还可以让一个函数的结果成为另一个函数的输入。 
+
+### 8.1 比较器复合
+使用静态方法Comparator.comparing， 根据提取用于比较的键值的Function来返回一个Comparator， 如下所示
+```java
+Comparator<Apple> c = Comparator.comparing(Apple::getWeight);
+```
+1. 逆序
+将苹果按照重量逆序排序，可以使用下面的方法实现
+```java
+inventory.sort(comparing(Apple::getWeight).reversed()); // 按重量递减排序
+```
+2. 比较器链
+但如果发现有两个苹果一样重怎么办？ 哪个苹果应该排在前面呢？ 你可能需要再提供一个Comparator来进一步定义这个比较。 比如， 在按重量比较两个苹果之后， 你可能想要按原产国排序。 thenComparing方法就是做这个用的。 它接受一个函数作为参数（ 就像comparing方法一样） ， 如果两个对象用第一个Comparator比较之后是一样的， 就提供第二个Comparator。 
+```java
+inventory.sort(comparing(Apple::getWeight)
+.reversed() // 按重量递减排序
+.thenComparing(Apple::getCountry)); // 两个苹果一样重时， 进一步按国家排序
+```
+
+### 8.2 Predicate复合
+Predicate接口包括三个方法： negate、 and和or， 让你可以重用已有的Predicate来创建更复杂的Predicate。 比如， 你可以使用negate方法来返回一个Predicate的非， 比如苹果不是红的：
+```java
+// 非红苹果
+Predicate<Apple> notRedApple = redApple.negate(); // 产生现有Predicate对象redApple的非
+// 比如一个苹果既是红色又比较重：
+Predicate<Apple> redAndHeavyApple =redApple.and(a -> a.getWeight() > 150); // 链接两个谓词来生成另一个Predicate对象
+// 要么是重（ 150克以上） 的红苹果， 要么是绿苹果：
+Predicate<Apple> redAndHeavyAppleOrGreen = redApple.and(a -> a.getWeight() > 150).or(a -> "green".equals(a.getColor())); // 链接Predicate的方法来构造更复杂Predicate对象
+```
+**从简单Lambda表达式出发， 你可以构建更复杂的表达式， 但读起来仍然和问题的陈述差不多！ 请注意， and和or方法是按照在表达式链中的位置， 从左向右确定优先级的。 因此， a.or(b).and(c)可以看作(a || b) && c。**
+
+### 8.3 函数复合
+可以把Function接口所代表的Lambda表达式复合起来。 Function接口为此配了andThen和compose两个默认方法， 它们都会返回Function的一个实例。
+andThen方法会返回一个函数， 它先对输入应用一个给定函数， 再对输出应用另一个函数。 比如， 假设有一个函数f给数字加1 (x -> x + 1)， 另一个函数g给数字乘2， 你可以将它们组合成一个函数h， 先给数字加1， 再给结果乘2：
+```java
+Function<Integer, Integer> f = x -> x + 1;
+Function<Integer, Integer> g = x -> x * 2;
+Function<Integer, Integer> h = f.andThen(g); // 数学上会写作g(f(x))或(g o f)(x)
+int result = h.apply(1); // 这将返回4
+```
+
+使用compose方法， 先把给定的函数用作compose的参数里面给的那个函数， 然后再把函数本身用于结果。 比如在上一个例子里用compose的话， 它将意味着f(g(x))， 而andThen则意味着g(f(x))：
+```java
+Function<Integer, Integer> f = x -> x + 1;
+Function<Integer, Integer> g = x -> x * 2;
+Function<Integer, Integer> h = f.compose(g); // 数学上会写作f(g(x))或(f o g)(x)
+int result = h.apply(1); // 这将返回3
+```
+![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic3-6.png)
+**andThen和compose之间的区别**
+
+
+## 9. 数学中的类似思想
+
+## 10. 小结
+* Lambda表达式可以理解为一种匿名函数： 它没有名称， 但有参数列表、 函数主体、 返回类型， 可能还有一个可以抛出的异常的列表。
+* Lambda表达式让你可以简洁地传递代码。
+* 函数式接口就是仅仅声明了一个抽象方法的接口。
+* 只有在接受函数式接口的地方才可以使用Lambda表达式。
+* Lambda表达式允许你直接内联， 为函数式接口的抽象方法提供实现， 并且将整个表达式作为函数式接口的一个实例。
+* Java 8自带一些常用的函数式接口， 放在java.util.function包里， 包括Predicate\<T\>、 Function\<T,R\>、 Supplier\<T\>、 Consumer\<T\>和BinaryOperator\<T\>
+* 为了避免装箱操作， 对Predicate\<T\>和Function\<T, R\>等通用函数式接口的原始类型特化： IntPredicate、 IntToLongFunction等。
+* 环绕执行模式（ 即在方法所必需的代码中间， 你需要执行点儿什么操作， 比如资源分配和清理） 可以配合Lambda提高灵活性和可重用性。
+* Lambda表达式所需要代表的类型称为目标类型。
+* 方法引用让你重复使用现有的方法实现并直接传递它们。
+* Comparator、 Predicate和Function等函数式接口都有几个可以用来结合Lambda表达式的默认方法。
