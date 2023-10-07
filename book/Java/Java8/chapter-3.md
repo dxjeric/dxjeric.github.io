@@ -47,6 +47,7 @@ Lambda的基本语法是 ```(parameters) -> expression``` 或者 ```(parameters)
 **PS: ```(Integer i) -> return "Alan" + i;```这个是错误的写法，因为return是一个控制流语句。 要使此Lambda有效， 需要使花括号， 如下所示：```(Integer i) -> {return "Alan" + i;}```** 
 
 **Lambda示例**
+
 | 使用案例              | Lambda示例                                                   |
 | --------------------- | ------------------------------------------------------------ |
 | 布尔表达式            | (List\<String\> list) -> list.isEmpty()                      |
@@ -169,6 +170,7 @@ oddNumbers.test(1000); // false（ 装箱）
 一般来说， 针对专门的输入参数类型的函数式接口的名称都要加上对应的原始类型前缀， 比如DoublePredicate、 IntConsumer、 LongBinaryOperator、 IntFunction等。 Function接口还有针对输出参数类型的变种： ToIntFunction\<T\>、 IntToDoubleFunction等。
 
 下面的表格中列出了Java 8中的常用函数式接口:
+
 | 函数式接口          | 函数描述符     | 原始类型特化                                                 |
 | ------------------- | -------------- | ------------------------------------------------------------ |
 | Predicate\<T\>      | T->boolean     | IntPredicate,LongPredicate, DoublePredicate                  |
@@ -182,6 +184,7 @@ oddNumbers.test(1000); // false（ 装箱）
 | BiFunction\<T,U,R\> | (T,U)->R       | ToIntBiFunction\<T,U\>, ToLongBiFunction\<T,U\>, ToDoubleBiFunction\<T,U\> |
 
 下面表格中列出了Lambdas及函数式接口的例子:
+
 | 使用案例               | Lambda的例子                                                 | 对应的函数式接口                                             |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | 布尔表达式             | (List\<String\> list) -> list.isEmpty()                        | Predicate\<List\<String\>\>                                      |
