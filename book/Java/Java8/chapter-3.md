@@ -175,7 +175,7 @@ oddNumbers.test(1000); // false（ 装箱）
 | ------------------- | -------------- | ------------------------------------------------------------ |
 | Predicate\<T\>      | T->boolean     | IntPredicate,LongPredicate, DoublePredicate                  |
 | Consumer\<T\>       | T->void        | IntConsumer,LongConsumer, DoubleConsumer                     |
-| Function\<T,R\>     | T->R           | IntFunction\<R\>, IntToDoubleFunction, IntToLongFunction, LongFunction<R>, LongToDoubleFunction, LongToIntFunction, DoubleFunction<R>, ToIntFunction\<T\>, ToDoubleFunction\<T\>, ToLongFunction\<T\> |
+| Function\<T,R\>     | T->R           | IntFunction\<R\>, IntToDoubleFunction, IntToLongFunction, LongFunction\<R\>, LongToDoubleFunction, LongToIntFunction, DoubleFunction\<R\>, ToIntFunction\<T\>, ToDoubleFunction\<T\>, ToLongFunction\<T\> |
 | Supplier\<T\>       | ()->T          | BooleanSupplier,IntSupplier, LongSupplier, DoubleSupplier    |
 | UnaryOperator\<T\>  | T->T           | IntUnaryOperator, LongUnaryOperator, DoubleUnaryOperator     |
 | BinaryOperator\<T\> | (T,T)->T       | IntBinaryOperator, LongBinaryOperator, DoubleBinaryOperator  |
