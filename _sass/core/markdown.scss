@@ -56,7 +56,7 @@
   table th,td{
     border-right:1px solid #000000;border-bottom:1px solid #000000;
   }
-  
+
   // ruby highlight fixed, TODO: line number display
   figure {
     margin: 0;
@@ -74,7 +74,7 @@
   // improved
   code,
   tt {
-    font-size: $font-size-small;
+    font-size: $font-code-size;
     border: $border;
     color: $theme-code-inline;
     background-color: $theme-code-inline-background;
