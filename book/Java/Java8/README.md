@@ -1,7 +1,7 @@
 # java8实战笔记
 ![](https://tse4-mm.cn.bing.net/th/id/OIP-C.7mHXdzoAibnveFkFTyaqXgHaHa?w=173&h=180&c=7&r=0&o=5&pid=1.7)
 
-[代码仓库](https://github.com/java8/)
+[**代码仓库**](https://github.com/java8/)
 
 ## 第一部分 基础知识
 * [第一章](https://dxjeric.github.io/book/Java/Java8/chapter-1.html) 总结Java的主要变化
