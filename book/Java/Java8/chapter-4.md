@@ -146,6 +146,7 @@ System.out.println(threeHighCaloricDishNames); // 结果是[pork, beef,chicken]
 图4-3用DVD对比在线流媒体的例子展示了流和集合之间的差异。
 
 ![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic4-3.png)
+
 **图 4-3 流与集合**
 
 ### 3.1 只能遍历一次
@@ -189,6 +190,7 @@ List<String> names = menu.stream()
 
 图4-4说明了流（ 内部迭代） 与集合（ 外部迭代） 之间的差异。
 ![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic4-4.png)
+
 **图 4-4 内部迭代与外部迭代**
 
 ## 4. 流操作
@@ -205,6 +207,7 @@ List<String> names = menu.stream() // 从菜单获得流
         .collect(toList()); // 将Stream转换为List
 ```
 ![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic4-5.png)
+
 **图 4-5 中间操作与终端操作**
 
 ### 4.1 中间操作
