@@ -181,3 +181,124 @@ String shortMenu = menu.stream().collect( reducing( "",Dish::getName, (s1, s2) -
 (3) 这就意味着它需要的函数必须能接受两个参数， 然后返回一个相同类型的值， 但这里用的Lambda表达式接受的参数是两个菜， 返回的却是一个字符串。
 
 ## 3. 分组
+一个常见的数据库操作是根据一个或多个属性对集合中的项目进行分组。 就像前面讲到按货币对交易进行分组的例子一样， 如果用指令式风格来实现的话， 这个操作可能会很麻烦、 啰嗦而且容易出错。 但是， 如果用Java 8所推崇的函数式风格来重写的话， 就很容易转化为一个非常容易看懂的语句。 我们来看看这个功能的第二个例子： 假设你要把菜单中的菜按照类型进行分类， 有肉的放一组， 有鱼的放一组，其他的都放另一组。 用Collectors.groupingBy工厂方法返回的收集器就可以轻松地完成这项任务， 如下所示：
+```java
+Map<Dish.Type, List<Dish>> dishesByType = menu.stream().collect(groupingBy(Dish::getType));
+// 其结果是下面的Map
+// {FISH=[prawns, salmon], OTHER=[french fries, rice, season fruit, pizza], MEAT=[pork, beef, chicken]}
+```
+
+如图6-4所示， 分组操作的结果是一个Map， 把分组函数返回的值作为映射的键， 把流中所有具有这个分类值的项目的列表作为对应的映射值。 在菜单分类的例子中， 键就是菜的类型， 值就是包含所有对应类型的菜肴的列表。
+
+![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic6-4.png)
+
+**图 6-4 在分组过程中对流中的项目进行分类**
+
+但是， 分类函数不一定像方法引用那样可用， 因为你想用以分类的条件可能比简单的属性访问器要复杂。 例如， 你可能想把热量不到400卡路里的菜划分为“低热量” （ diet） ， 热量400到700卡路里的菜划为“普通” （ normal） ， 高于700卡路里的划为“高热量” （ fat） 。 由于Dish类的作者没有把这个操作写成一个方法，你无法使用方法引用， 但你可以把这个逻辑写成Lambda表达式：
+```java
+public enum CaloricLevel {
+    DIET, NORMAL, FAT
+}
+
+Map<CaloricLevel, List<Dish>> dishesByCaloricLevel = menu.stream().collect(groupingBy(dish -> {
+    if (dish.getCalories() <= 400)
+        return CaloricLevel.DIET;
+    else if (dish.getCalories() <= 700)
+        return CaloricLevel.NORMAL;
+    else
+        return CaloricLevel.FAT;
+}))
+```
+
+### 3.1 多级分组
+要实现多级分组， 我们可以使用一个由双参数版本的Collectors.groupingBy工厂方法创建的收集器， 它除了普通的分类函数之外， 还可以接受collector类型的第二个参数。 
+那么要进行二级分组的话， 我们可以把一个内层groupingBy传递给外层groupingBy， 并定义一个为流中项目分类的二级标准， 如代码清单6-2所示。
+
+```java
+Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel = menu.stream().collect(
+        groupingBy(Dish::getType, // 一级分类函数
+                groupingBy(dish -> { // 二级分类函数
+                    if (dish.getCalories() <= 400)
+                        return CaloricLevel.DIET;
+                    else if (dish.getCalories() <= 700)
+                        return CaloricLevel.NORMAL;
+                    else
+                        return CaloricLevel.FAT;
+                })));
+// 这个二级分组的结果就是像下面这样的两级Map：
+/*
+{
+    MEAT={DIET=[chicken], NORMAL=[beef], FAT=[pork]},
+    FISH={DIET=[prawns], NORMAL=[salmon]},
+    OTHER={DIET=[rice, seasonal fruit], NORMAL=[french fries, pizza]}
+}
+*/
+```
+
+图6-5显示了为什么结构相当于 n 维表格， 并强调了分组操作的分类目的。
+一般来说， 把groupingBy看作“桶” 比较容易明白。 第一个groupingBy给每个键建立了一个桶。 然后再用下游的收集器去收集每个桶中的元素， 以此得到 n 级分组。
+
+![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic6-5.png)
+
+**图 6-5 n 层嵌套映射和 n 维分类表之间的等价关系**
+
+### 3.2 按子组收集数据
+还要注意， 普通的单参数groupingBy(f)（ 其中f是分类函数） 实际上是groupingBy(f, toList())的简便写法。
+```java
+Map<Dish.Type, Long> typesCount = menu.stream().collect(groupingBy(Dish::getType, counting()));
+
+// 其结果是下面的Map：
+// {MEAT=3, FISH=2, OTHER=4}
+```
+
+普通的单参数groupingBy(f)（ 其中f是分类函数） 实际上是groupingBy(f, toList())的简便写法。
+
+再举一个例子， 你可以把前面用于查找菜单中热量最高的菜肴的收集器改一改， 按照菜的类型分类：
+```java
+Map<Dish.Type, Optional<Dish>> mostCaloricByType = menu.stream().collect(groupingBy(Dish::getType, maxBy(comparingInt(Dish::getCalories))));
+
+// 这个分组的结果显然是一个map， 以Dish的类型作为键， 以包装了该类型中热量最高的Dish的Optional<Dish>作为值：
+// {FISH=Optional[salmon], OTHER=Optional[pizza], MEAT=Optional[pork]}
+```
+
+这个Map中的值是Optional， 因为这是maxBy工厂方法生成的收集器的类型， 但实际上， 如果菜单中没有某一类型的Dish， 这个类型就不会对应一个Optional. empty()值， 而且根本不会出现在Map的键中。 groupingBy收集器只有在应用分组条件后， 第一次在流中找到某个键对应的元素时才会把键加入分组Map中。 这意味着Optional包装器在这里不是很有用， 因为它不会仅仅因为它是归约收集器的返回类型而表达一个最终可能不存在却意外存在的值。
+
+1. 把收集器的结果转换为另一种类型
+因为分组操作的Map结果中的每个值上包装的Optional没什么用， 所以你可能想要把它们去掉。 要做到这一点， 或者更一般地来说， 把收集器返回的结果转换为另一种类型， 你可以使用Collectors.collectingAndThen工厂方法返回的收集器， 如下所示。
+
+代码清单6-3 查找每个子组中热量最高的Dish
+```java
+Map<Dish.Type, Dish> mostCaloricByType = menu.stream()
+    .collect(groupingBy(Dish::getType, // 分类函数
+            collectingAndThen(
+                    maxBy(comparingInt(Dish::getCalories)), // 包装后的收集器
+                    Optional::get))); // 转换函数
+
+// 输出结果为
+// {FISH=salmon, OTHER=pizza, MEAT=pork}
+```
+
+这个工厂方法接受两个参数——要转换的收集器以及转换函数， 并返回另一个收集器。 这个收集器相当于旧收集器的一个包装， collect操作的最后一步就是将返回值用转换函数做一个映射。 在这里， 被包起来的收集器就是用maxBy建立的那个， 而转换函数Optional::get则把返回的Optional中的值提取出来。 前面已经说过， 这个操作放在这里是安全的， 因为reducing收集器永远都不会返回Optional.empty()。 其结果是下面的Map：
+
+![](https://github.com/dxjeric/dxjeric.github.io/raw/master/pictures/Java/Java8/pic6-6.png)
+
+**图 6-6 嵌套收集器来获得多重效果**
+
+图6-6可以直观地展示它们是怎么工作的。 从最外层开始逐层向里， 注意以下几点。
+* 收集器用虚线表示， 因此groupingBy是最外层， 根据菜肴的类型把菜单流分组， 得到三个子流。
+* groupingBy收集器包裹着collectingAndThen收集器， 因此分组操作得到的每个子流都用这第二个收集器做进一步归约。
+* collectingAndThen收集器又包裹着第三个收集器maxBy。
+* 随后由归约收集器进行子流的归约操作， 然后包含它的collectingAndThen收集器会对其结果应用Optional:get转换函数。
+* 对三个子流分别执行这一过程并转换而得到的三个值， 也就是各个类型中热量最高的Dish， 将成为groupingBy收集器返回的Map中与各个分类键（ Dish的类型） 相关联的值。
+
+2. 与groupingBy联合使用的其他收集器的例子
+
+通过groupingBy工厂方法的第二个参数传递的收集器将会对分到同一组中的所有流元素执行进一步归约操作。 例如， 你还重用求出所有菜肴热量总和的收集器， 不过这次是对每一组Dish求和：
+```java
+Map<Dish.Type, Integer> totalCaloriesByType = menu.stream().collect(groupingBy(Dish::getType, summingInt(Dish::getCalories)));
+```
+
+## 4. 分区
+分区是分组的特殊情况： 由一个Predicate（ 返回一个布尔值的函数） 作为分类函数， 它称分区函数。 分区是分组的特殊情况： 由一个谓词（ 返回一个布尔值的函数） 作为分类函数， 它称分区函数。 
+
+### 4.1 分区的优势
